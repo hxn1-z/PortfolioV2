@@ -1,0 +1,62 @@
+/* Page Wrapper - Transition container */
+
+.page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.page-transition-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--accent-primary);
+  transform-origin: top;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.page-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Page number indicator - bottom left */
+.page-number-indicator {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.page-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+}
+
+.page-num {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  text-transform: capitalize;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page-number-indicator {
+    bottom: 1rem;
+    left: 1rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .page-transition-overlay {
+    display: none;
+  }
+}

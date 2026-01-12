@@ -1,0 +1,89 @@
+/* Intro Animation - Minimal Hand-drawn Style */
+
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #0a0a12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.intro-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Main content */
+.intro-content {
+  position: relative;
+  z-index: 5;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Name container */
+.intro-name-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.intro-name {
+  display: flex;
+  gap: 0.05em;
+}
+
+.intro-letter {
+  font-size: clamp(3rem, 12vw, 7rem);
+  font-weight: 700;
+  color: #f5f5f7;
+  display: inline-block;
+  letter-spacing: -0.02em;
+}
+
+/* Handwritten underline SVG */
+.intro-underline-svg {
+  width: clamp(200px, 60vw, 400px);
+  height: 30px;
+  margin-top: -0.5rem;
+}
+
+/* Tagline */
+.intro-tagline {
+  font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Screen wipe */
+.intro-wipe {
+  position: absolute;
+  inset: 0;
+  background: #0a0a12;
+  transform-origin: bottom center;
+  z-index: 100;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .intro-tagline {
+    font-size: 0.85rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .intro-letter {
+    transition: none;
+  }
+}
