@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
-// magnetic button that follows cursor
 const MagneticButton = ({ children, className = '', strength = 0.3, ...props }) => {
   const ref = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });

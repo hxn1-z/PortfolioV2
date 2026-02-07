@@ -2,10 +2,10 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { ExternalLink, Github, ChevronDown, ChevronUp, Play } from 'lucide-react';
 import { projects } from '../data/portfolioData';
-import AnimatedSketches from './AnimatedSketches';
+import SectionDoodle from './SectionDoodle';
+import HandHighlight from './HandHighlight';
 import './Projects.css';
 
-// Projects section - clean cards with expand functionality
 const Projects = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -17,11 +17,9 @@ const Projects = () => {
 
   return (
     <section id="projects" className="projects" ref={ref}>
-      {/* Animated hand-drawn sketches */}
-      <AnimatedSketches variant="projects" />
-      
-      {/* Section accent line */}
-      <div className="section-accent-line" />
+      <SectionDoodle variant="laptop" position="top-right" />
+      <SectionDoodle variant="code" position="bottom-left" />
+
 
       <div className="projects-container">
         <motion.div
@@ -30,7 +28,7 @@ const Projects = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="section-title">{projects.title}</h2>
+          <h2 className="section-title"><HandHighlight variant="underline" color="var(--accent-primary)">{projects.title}</HandHighlight></h2>
         </motion.div>
 
         <div className="projects-grid">
@@ -42,10 +40,8 @@ const Projects = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              {/* Project number label */}
               <span className="project-number">0{index + 1}</span>
 
-              {/* Image */}
               <div className="project-image-wrapper">
                 <img
                   src={project.image}
@@ -60,7 +56,6 @@ const Projects = () => {
                   <span>{project.title.charAt(0)}</span>
                 </div>
 
-                {/* Overlay with links */}
                 <div className="project-overlay">
                   <div className="project-links">
                     {!project.showGithubOnly && project.liveUrl && (
@@ -91,19 +86,16 @@ const Projects = () => {
                 </div>
               </div>
 
-              {/* Content */}
               <div className="project-content">
                 <h3 className="project-title">{project.title}</h3>
                 <p className="project-description">{project.description}</p>
                 
-                {/* Tags */}
                 <div className="project-tags">
                   {project.tags.map((tag) => (
                     <span key={tag} className="project-tag">{tag}</span>
                   ))}
                 </div>
 
-                {/* Expand button */}
                 {(project.fullDescription || (project.media && project.media.length > 0)) && (
                   <button
                     className="project-expand-btn"
@@ -119,7 +111,6 @@ const Projects = () => {
                 )}
               </div>
 
-              {/* Expanded content */}
               <AnimatePresence>
                 {expandedProject === project.id && (
                   <motion.div

@@ -1,17 +1,19 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { achievements } from '../data/portfolioData';
+import SectionDoodle from './SectionDoodle';
+import HandHighlight from './HandHighlight';
 import './Achievements.css';
 
-// Achievements section
 const Achievements = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
     <section id="achievements" className="achievements" ref={ref}>
-      {/* Section accent line */}
-      <div className="section-accent-line" />
+      <SectionDoodle variant="trophy" position="top-left" />
+      <SectionDoodle variant="star" position="bottom-right" />
+
 
       <div className="achievements-container">
         <motion.div
@@ -20,7 +22,7 @@ const Achievements = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="section-title">{achievements.title}</h2>
+          <h2 className="section-title"><HandHighlight variant="underline" color="var(--accent-primary)">{achievements.title}</HandHighlight></h2>
         </motion.div>
 
         <div className="achievements-grid">

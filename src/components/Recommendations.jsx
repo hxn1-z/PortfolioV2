@@ -2,12 +2,12 @@ import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Lock, Unlock, FileText, Download, Eye, X } from 'lucide-react';
 import { recommendations } from '../data/portfolioData';
+import SectionDoodle from './SectionDoodle';
+import HandHighlight from './HandHighlight';
 import './Recommendations.css';
 
-// access code from environment variable
 const ACCESS_CODE = import.meta.env.VITE_RECOMMENDATIONS_CODE;
 
-// recommendations section with code protection
 const Recommendations = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -37,8 +37,9 @@ const Recommendations = () => {
 
   return (
     <section id="recommendations" className="recommendations" ref={ref}>
-      {/* Section accent line */}
-      <div className="section-accent-line" />
+      <SectionDoodle variant="lightbulb" position="top-right" />
+      <SectionDoodle variant="sparkles" position="bottom-left" />
+
       
       <div className="recommendations-container">
         <motion.div
@@ -47,7 +48,7 @@ const Recommendations = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="section-title">{recommendations.title}</h2>
+          <h2 className="section-title"><HandHighlight variant="underline" color="var(--accent-primary)">{recommendations.title}</HandHighlight></h2>
         </motion.div>
 
         {!isUnlocked ? (
@@ -129,7 +130,6 @@ const Recommendations = () => {
               ))}
             </div>
 
-            {/* PDF Preview Modal */}
             {previewPdf && (
               <motion.div 
                 className="pdf-modal-overlay"

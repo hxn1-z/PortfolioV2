@@ -2,7 +2,6 @@ import { Github, Linkedin, Instagram, Heart } from 'lucide-react';
 import { footer, personalInfo } from '../data/portfolioData';
 import './Footer.css';
 
-// Clean footer
 const Footer = () => {
   const socialLinks = [
     { icon: Github, url: personalInfo.social.github, label: 'GitHub' },
@@ -13,7 +12,6 @@ const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer-container">
-        {/* Top section */}
         <div className="footer-top">
           <div className="footer-brand">
             <span className="footer-logo">{personalInfo.name.split(' ')[0]}.</span>
@@ -36,10 +34,8 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Divider */}
         <div className="footer-divider" />
 
-        {/* Bottom section */}
         <div className="footer-bottom">
           <p className="footer-made">
             Made with <Heart size={14} className="heart-icon" /> by {footer.text.replace('Designed & Built by ', '')}

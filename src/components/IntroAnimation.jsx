@@ -3,13 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { introAnimation } from '../data/portfolioData';
 import './IntroAnimation.css';
 
-// Minimal, hand-drawn style intro animation
 const IntroAnimation = ({ onComplete }) => {
   const [phase, setPhase] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const canvasRef = useRef(null);
 
-  // Draw hand-drawn style elements on canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -22,7 +20,6 @@ const IntroAnimation = ({ onComplete }) => {
       canvas.height = window.innerHeight;
     };
 
-    // Draw a wobbly/sketchy line
     const drawSketchyLine = (x1, y1, x2, y2, progress) => {
       if (progress <= 0) return;
       
@@ -37,7 +34,6 @@ const IntroAnimation = ({ onComplete }) => {
         const t = i / steps;
         const x = x1 + (x2 - x1) * t;
         const y = y1 + (y2 - y1) * t;
-        // Add slight wobble
         const wobble = Math.sin(t * 10 + Date.now() * 0.002) * 2;
         
         if (i === 0) {
@@ -49,7 +45,6 @@ const IntroAnimation = ({ onComplete }) => {
       ctx.stroke();
     };
 
-    // Draw sketchy circle
     const drawSketchyCircle = (cx, cy, r, progress) => {
       if (progress <= 0) return;
       
@@ -84,7 +79,6 @@ const IntroAnimation = ({ onComplete }) => {
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
       
-      // Draw decorative sketchy circles that animate in
       drawSketchyCircle(centerX, centerY, 150, elapsed * 0.5);
       drawSketchyCircle(centerX, centerY, 200, (elapsed - 0.3) * 0.5);
 
@@ -102,12 +96,11 @@ const IntroAnimation = ({ onComplete }) => {
   }, []);
 
   useEffect(() => {
-    // Simplified animation phases
     const timers = [
-      setTimeout(() => setPhase(1), 200),    // Name starts
-      setTimeout(() => setPhase(2), 1200),   // Underline draws
-      setTimeout(() => setPhase(3), 2000),   // Tagline appears
-      setTimeout(() => setPhase(4), 3000),   // Exit begins
+      setTimeout(() => setPhase(1), 200),
+      setTimeout(() => setPhase(2), 1200),
+      setTimeout(() => setPhase(3), 2000),
+      setTimeout(() => setPhase(4), 3000),
       setTimeout(() => {
         setIsVisible(false);
         onComplete?.();
@@ -128,12 +121,9 @@ const IntroAnimation = ({ onComplete }) => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
         >
-          {/* Sketchy canvas background */}
           <canvas ref={canvasRef} className="intro-canvas" />
 
-          {/* Main content - simple and clean */}
           <div className="intro-content">
-            {/* Name with hand-drawn feel */}
             <motion.div 
               className="intro-name-container"
               initial={{ opacity: 0 }}
@@ -163,7 +153,6 @@ const IntroAnimation = ({ onComplete }) => {
                 ))}
               </div>
               
-              {/* Hand-drawn underline */}
               <motion.svg
                 className="intro-underline-svg"
                 viewBox="0 0 300 30"
@@ -180,7 +169,6 @@ const IntroAnimation = ({ onComplete }) => {
                   animate={phase >= 2 ? { pathLength: 1 } : {}}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 />
-                {/* Small scribble accent */}
                 <motion.path
                   d="M140 22 Q150 18, 160 24"
                   fill="none"
@@ -194,7 +182,6 @@ const IntroAnimation = ({ onComplete }) => {
               </motion.svg>
             </motion.div>
 
-            {/* Tagline - simple fade in */}
             <motion.div
               className="intro-tagline"
               initial={{ opacity: 0, y: 10 }}
@@ -205,7 +192,6 @@ const IntroAnimation = ({ onComplete }) => {
             </motion.div>
           </div>
 
-          {/* Simple wipe transition */}
           <motion.div
             className="intro-wipe"
             initial={{ scaleY: 0 }}

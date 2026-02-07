@@ -1,12 +1,11 @@
-import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowDown, Github, Linkedin, Instagram, Mail } from 'lucide-react';
 import { heroCards, personalInfo } from '../data/portfolioData';
 import MagneticButton from './MagneticButton';
-import AnimatedSketches from './AnimatedSketches';
+import SectionDoodle from './SectionDoodle';
+import HandHighlight from './HandHighlight';
 import './Hero.css';
 
-// Hero section - clean modern design
 const Hero = () => {
   const scrollToAbout = () => {
     document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' });
@@ -24,10 +23,8 @@ const Hero = () => {
 
   return (
     <section id="home" className="hero">
-      {/* Animated hand-drawn sketches */}
-      <AnimatedSketches variant="hero" />
-
-      {/* Main content */}
+      <SectionDoodle variant="code" position="bottom-left" />
+      <SectionDoodle variant="sparkles" position="top-right" />
       <div className="hero-content">
         <motion.div
           className="hero-text"
@@ -35,7 +32,6 @@ const Hero = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Name with creative styling */}
           <div className="hero-name-wrapper">
             <motion.h1 className="hero-name">
               <span className="hero-name-first">
@@ -76,7 +72,6 @@ const Hero = () => {
               )}
             </motion.h1>
 
-            {/* Hand-drawn underline */}
             <motion.svg
               className="hero-underline"
               viewBox="0 0 400 30"
@@ -103,7 +98,6 @@ const Hero = () => {
             </motion.svg>
           </div>
 
-          {/* Title */}
           <motion.p
             className="hero-title"
             initial={{ opacity: 0, y: 20 }}
@@ -113,17 +107,17 @@ const Hero = () => {
             {personalInfo.title}
           </motion.p>
 
-          {/* Tagline */}
           <motion.p
             className="hero-tagline"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6, duration: 0.6 }}
           >
-            {personalInfo.tagline}
+            <HandHighlight variant="highlight" color="rgba(109, 40, 217, 0.25)" delay={2}>
+              {personalInfo.tagline}
+            </HandHighlight>
           </motion.p>
 
-          {/* CTA Buttons */}
           <motion.div
             className="hero-cta"
             initial={{ opacity: 0, y: 20 }}
@@ -145,7 +139,6 @@ const Hero = () => {
             </MagneticButton>
           </motion.div>
 
-          {/* Social links */}
           <motion.div
             className="hero-social"
             initial={{ opacity: 0 }}
@@ -171,14 +164,12 @@ const Hero = () => {
           </motion.div>
         </motion.div>
 
-        {/* Visual side with profile */}
         <motion.div
           className="hero-visual"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, duration: 0.8 }}
         >
-          {/* Profile image */}
           <div className="hero-profile-container">
             <div className="hero-profile-frame">
               <img
@@ -196,7 +187,6 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Floating cards */}
           {heroCards.map((card, index) => (
             <motion.div
               key={index}
@@ -215,7 +205,6 @@ const Hero = () => {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
       <motion.button
         className="hero-scroll"
         onClick={scrollToAbout}

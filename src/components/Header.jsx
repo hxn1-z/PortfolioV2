@@ -4,18 +4,15 @@ import { Menu, X } from 'lucide-react';
 import { navigation, personalInfo } from '../data/portfolioData';
 import './Header.css';
 
-// Clean sticky header
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
 
-  // Track scroll position
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
 
-      // Find active section
       const sections = navigation.links.map(link => link.href.slice(1));
       for (const section of sections.reverse()) {
         const element = document.getElementById(section);
@@ -77,7 +74,6 @@ const Header = () => {
         </button>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.nav

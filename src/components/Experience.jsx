@@ -2,10 +2,10 @@ import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Image, ChevronDown, ChevronUp } from 'lucide-react';
 import { experience } from '../data/portfolioData';
-import AnimatedSketches from './AnimatedSketches';
+import SectionDoodle from './SectionDoodle';
+import HandHighlight from './HandHighlight';
 import './Experience.css';
 
-// Experience section - timeline with clean design
 const Experience = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -17,11 +17,9 @@ const Experience = () => {
 
   return (
     <section id="experience" className="experience" ref={ref}>
-      {/* Animated hand-drawn sketches */}
-      <AnimatedSketches variant="experience" />
-      
-      {/* Section accent line */}
-      <div className="section-accent-line" />
+      <SectionDoodle variant="timeline" position="top-right" />
+      <SectionDoodle variant="coffee" position="bottom-left" />
+
 
       <div className="experience-container">
         <motion.div
@@ -30,7 +28,7 @@ const Experience = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="section-title">{experience.title}</h2>
+          <h2 className="section-title"><HandHighlight variant="underline" color="var(--accent-primary)">{experience.title}</HandHighlight></h2>
         </motion.div>
 
         <div className="timeline">
@@ -47,13 +45,11 @@ const Experience = () => {
                 animate={isInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.5, delay: index * 0.15 }}
               >
-                {/* Timeline marker */}
                 <div className="timeline-marker">
                   <div className="timeline-dot" />
                   <div className="timeline-line" />
                 </div>
 
-                {/* Content card */}
                 <div className="timeline-content">
                   <div className="timeline-header">
                     <h3 className="timeline-role">{item.role}</h3>

@@ -1,21 +1,19 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { skills } from '../data/portfolioData';
-import AnimatedSketches from './AnimatedSketches';
+import SectionDoodle from './SectionDoodle';
+import HandHighlight from './HandHighlight';
 import './Skills.css';
 
-// Skills section - clean cards with subtle animations
 const Skills = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
     <section id="skills" className="skills" ref={ref}>
-      {/* Animated hand-drawn sketches */}
-      <AnimatedSketches variant="skills" />
-      
-      {/* Section accent line */}
-      <div className="section-accent-line" />
+      <SectionDoodle variant="brackets" position="top-left" />
+      <SectionDoodle variant="gear" position="bottom-right" />
+
       
       <div className="skills-container">
         <motion.div
@@ -24,7 +22,7 @@ const Skills = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="section-title">{skills.title}</h2>
+          <h2 className="section-title"><HandHighlight variant="underline" color="var(--accent-primary)">{skills.title}</HandHighlight></h2>
         </motion.div>
 
         <div className="skills-grid">

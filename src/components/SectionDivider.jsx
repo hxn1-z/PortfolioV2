@@ -2,7 +2,6 @@ import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import './SectionDivider.css';
 
-// Hand-drawn style section divider with animated SVG
 const SectionDivider = ({ variant = 'wave' }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
@@ -68,7 +67,6 @@ const SectionDivider = ({ variant = 'wave' }) => {
     ),
     sketch: (
       <svg viewBox="0 0 1200 40" preserveAspectRatio="none" className="divider-svg">
-        {/* Main "rough" line */}
         <motion.path
           d="M0,20 C100,10 150,30 250,20 S350,15 450,25 S550,15 650,20 S750,25 850,20 S950,15 1050,25 S1150,20 1200,20"
           fill="none"
@@ -80,7 +78,6 @@ const SectionDivider = ({ variant = 'wave' }) => {
           animate={isInView ? { pathLength: 1 } : {}}
           transition={{ duration: 1.2, ease: "easeInOut" }}
         />
-        {/* Secondary "sketch" line for messy pencil look */}
         <motion.path
           d="M5,22 C105,12 155,32 255,22 S355,17 455,27 S555,17 655,22 S755,27 855,22 S955,17 1055,27 S1155,22 1200,22"
           fill="none"

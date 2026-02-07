@@ -1,35 +1,31 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { aboutMe, personalInfo } from '../data/portfolioData';
-import AnimatedSketches from './AnimatedSketches';
+import SectionDoodle from './SectionDoodle';
+import HandHighlight from './HandHighlight';
 import './About.css';
 
-// About section - clean and modern
 const About = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
     <section id="about" className="about" ref={ref}>
-      {/* Animated hand-drawn sketches */}
-      <AnimatedSketches variant="about" />
+      <SectionDoodle variant="notebook" position="top-right" />
+      <SectionDoodle variant="coffee" position="bottom-left" />
 
-      {/* Section accent line */}
-      <div className="section-accent-line" />
 
       <div className="about-container">
-        {/* Section header */}
         <motion.div
           className="section-header"
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="section-title">{aboutMe.title}</h2>
+          <h2 className="section-title"><HandHighlight variant="underline" color="var(--accent-primary)">{aboutMe.title}</HandHighlight></h2>
         </motion.div>
 
         <div className="about-content">
-          {/* Image section with creative frame */}
           <motion.div
             className="about-image-section"
             initial={{ opacity: 0, x: -50 }}
@@ -54,7 +50,6 @@ const About = () => {
             </div>
           </motion.div>
 
-          {/* Text content */}
           <motion.div
             className="about-text-section"
             initial={{ opacity: 0, x: 50 }}
@@ -74,17 +69,11 @@ const About = () => {
               ))}
             </div>
 
-            {/* Highlights with hand-drawn underlines */}
             <div className="about-highlights">
-              <h3 className="highlights-title" style={{ position: 'relative', display: 'inline-block' }}>
-                Highlights
-                {/* Visual circle sketch */}
-                <div style={{ position: 'absolute', top: '-15px', left: '-20px', width: '200%', height: '200%', pointerEvents: 'none' }}>
-                  <AnimatedSketches variant="circle" />
-                </div>
-                <svg className="title-underline" viewBox="0 0 100 10">
-                  <path d="M0 5 Q25 2, 50 5 T100 5" fill="none" stroke="var(--accent-primary)" strokeWidth="2" strokeLinecap="round" />
-                </svg>
+              <h3 className="highlights-title">
+                <HandHighlight variant="underline" color="var(--accent-primary)" delay={0.2}>
+                  Highlights
+                </HandHighlight>
               </h3>
 
               <ul className="highlights-list">
@@ -103,7 +92,6 @@ const About = () => {
               </ul>
             </div>
 
-            {/* CTA */}
             <motion.div
               className="about-cta"
               initial={{ opacity: 0 }}

@@ -1,17 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import './InteractiveBackground.css';
 
-/**
- * CONTINUOUS ORGANIC FLUID
- * 
- * - MOVEMENT: 
- *   1. Swarm Center tracks mouse.
- *   2. CONTINUOUS ELASTICITY:
- *      Every particle has a UNIQUE elasticity based on its exact Z-depth + random noise.
- *      NO discrete layers.
- *      NO grouping.
- *      Every dot reacts at its own unique split-second timing.
- */
 const InteractiveBackground = ({ heroOnly = false }) => {
   const canvasRef = useRef(null);
   const [isHeroSection, setIsHeroSection] = useState(true);
@@ -23,10 +12,6 @@ const InteractiveBackground = ({ heroOnly = false }) => {
   const requestRef = useRef(null);
   const timeRef = useRef(0);
   const isInitializedRef = useRef(false);
-
-  // ═══════════════════════════════════════════════════════════════
-  // CONFIGURATION
-  // ═══════════════════════════════════════════════════════════════
 
   const CONFIG = {
     PARTICLE_COUNT: 500,
@@ -45,17 +30,14 @@ const InteractiveBackground = ({ heroOnly = false }) => {
     const particles = [];
 
     for (let i = 0; i < CONFIG.PARTICLE_COUNT; i++) {
-      // Z-DEPTH (-1 to 1) - Continuous
       const zDepth = (Math.random() * 2 - 1);
 
-      // Position
       const r = CONFIG.RADIUS * Math.sqrt(Math.random());
       const theta = Math.random() * 2 * Math.PI;
 
       const offX = r * Math.cos(theta);
       const offY = r * Math.sin(theta);
 
-      // SIZE
       const baseSize = zDepth > 0
         ? 2.5 + Math.random() * 3.5 + (zDepth * 2)
         : 1.5 + Math.random() * 1.5;
@@ -64,39 +46,18 @@ const InteractiveBackground = ({ heroOnly = false }) => {
         ? 0.7 + Math.random() * 0.3
         : 0.2 + Math.random() * 0.4;
 
-      // ════════════════════════════════════════════════════════
-      // UNIQUE ELASTICITY
-      // ════════════════════════════════════════════════════════
-      // Calculate a unique "drag" for this specific particle.
-      // Base it on depth (so front is faster), but add noise.
-      // Range: 0.005 (Back) to 0.12 (Front)
-      // BUT continuous, not stepped.
-
-      // Normalize Z (-1 -> 1) to (0 -> 1)
       const normZ = (zDepth + 1) / 2;
-
-      // Base curve: square it to exaggerate front speed
-      // Front (1) -> 1, Back (0) -> 0
       const speedCurve = Math.pow(normZ, 1.5);
-
-      // Map to range [0.005, 0.12]
       let myElasticity = 0.005 + (speedCurve * 0.115);
-
-      // Add 10% randomness so neighbors with similar Z don't lock together
-      // unique randomness for every single pill
       myElasticity *= (0.9 + Math.random() * 0.2);
 
       particles.push({
         offX,
         offY,
         zDepth,
-        elasticity: myElasticity, // UNIQUE for every pill
-
-        // Current Position
+        elasticity: myElasticity,
         x: centerX + offX,
         y: centerY + offY,
-
-        // Organic Life
         swayPhase: Math.random() * Math.PI * 2,
         swaySpeed: 0.3 + Math.random() * 0.3,
         swayRange: 5 + Math.random() * 10,
@@ -106,7 +67,6 @@ const InteractiveBackground = ({ heroOnly = false }) => {
         rotation: Math.random() * Math.PI,
         rotSpeed: (Math.random() - 0.5) * 0.005,
 
-        // Appearance
         baseSize,
         elongation: 1.2 + Math.random() * 1.5,
         lightness: 55 + (zDepth * 8),
@@ -159,34 +119,28 @@ const InteractiveBackground = ({ heroOnly = false }) => {
         return;
       }
 
-      // 1. MOVE SWARM CENTER
+      // Move swarm center toward mouse
       const swarmDx = mouse.x - swarm.x;
       const swarmDy = mouse.y - swarm.y;
       swarm.x += swarmDx * CONFIG.SWARM_FOLLOW_SPEED;
       swarm.y += swarmDy * CONFIG.SWARM_FOLLOW_SPEED;
 
-      // 2. MOVE PARTICLES
       particles.forEach(p => {
         const idealX = swarm.x + p.offX;
         const idealY = swarm.y + p.offY;
 
-        // UNIQUE ELASTICITY
-        // No grouped layers. Every pill has its own unique speed.
         p.x += (idealX - p.x) * p.elasticity;
         p.y += (idealY - p.y) * p.elasticity;
 
-        // SWAY & PULSE
         const swayX = Math.sin(time * p.swaySpeed + p.swayPhase) * p.swayRange;
         const swayY = Math.cos(time * p.swaySpeed * 0.9 + p.swayPhase + 1) * p.swayRange;
         const pulse = Math.sin(time * 0.6 - p.pulsePhase);
         const currentSize = p.baseSize * (1 + pulse * 0.15);
         p.rotation += p.rotSpeed;
 
-        // DRAW
         const drawX = p.x + swayX;
         const drawY = p.y + swayY;
 
-        // FADE
         const dRx = drawX - swarm.x;
         const dRy = drawY - swarm.y;
         const distFromSwarm = Math.sqrt(dRx * dRx + dRy * dRy);

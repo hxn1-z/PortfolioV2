@@ -1,19 +1,14 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { Send, Mail, MapPin, Loader2, ArrowRight } from 'lucide-react';
+import { Mail, MapPin, Loader2, ArrowRight } from 'lucide-react';
 import { contact, personalInfo } from '../data/portfolioData';
-import AnimatedSketches from './AnimatedSketches';
+import SectionDoodle from './SectionDoodle';
+import HandHighlight from './HandHighlight';
 import './Contact.css';
-
-// Contact form setup options:
-// formspree - easy, free tier 50/month: https://formspree.io
-// emailjs - 200/month free: https://emailjs.com  
-// custom backend - set CONTACT_API_ENDPOINT
 
 const FORMSPREE_ID = (import.meta.env.VITE_FORMSPREE_ID || '').trim();
 const CONTACT_API_ENDPOINT = '';
 
-// Contact section with creative elements
 const Contact = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -80,11 +75,9 @@ const Contact = () => {
 
   return (
     <section id="contact" className="contact" ref={ref}>
-      {/* Animated hand-drawn sketches */}
-      <AnimatedSketches variant="contact" />
-      
-      {/* Section accent line */}
-      <div className="section-accent-line" />
+      <SectionDoodle variant="mail" position="bottom-right" />
+      <SectionDoodle variant="arrow" position="top-left" />
+
 
       <div className="contact-container">
         <motion.div
@@ -93,11 +86,10 @@ const Contact = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="section-title">{contact.title}</h2>
+          <h2 className="section-title"><HandHighlight variant="underline" color="var(--accent-primary)">{contact.title}</HandHighlight></h2>
         </motion.div>
 
         <div className="contact-content">
-          {/* Info side */}
           <motion.div
             className="contact-info"
             initial={{ opacity: 0, x: -40 }}
@@ -129,13 +121,11 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* Quick message */}
             <div className="contact-quick-note">
               <p>i usually reply within a day or two</p>
             </div>
           </motion.div>
 
-          {/* Form */}
           <motion.form
             className="contact-form"
             onSubmit={handleSubmit}
@@ -209,7 +199,6 @@ const Contact = () => {
               ) : (
                 <>
                   Send Message
-                  <Send size={16} />
                 </>
               )}
             </button>

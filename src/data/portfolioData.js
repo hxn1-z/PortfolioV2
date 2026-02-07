@@ -1,4 +1,4 @@
-// master doc for all portfolio data - edit this to update the site
+import profileImage from "../assets/profile.jpg";
 
 export const personalInfo = {
   name: "Hani Zaidi",
@@ -11,15 +11,13 @@ export const personalInfo = {
     linkedin: "https://www.linkedin.com/in/hani-zaidi-50aa99386/",
     instagram: "https://www.instagram.com/hanizaidi09/",
   },
-  profileImage: "/assets/profile.jpg",
+  profileImage,
 };
 
-// floating cards
 export const heroCards = [
   { label: "looking for", value: "summer co-op" },
 ];
 
-// intro animation text - customize the loading screen
 export const introAnimation = {
   name: "hxn1.dev", // the big text shown during intro
   tagline: "pls hire me", // text below the name
@@ -289,8 +287,6 @@ export const contact = {
     "I'm open to internships, volunteering opportunities, robotics sponsorship connections, and serious project collaboration. If you'd like my resume, email me and I'll send it over.",
 };
 
-// Recommendations section - protected by access code
-// To add more recommendations, just add another object to the items array
 export const recommendations = {
   title: "Recommendation Letters",
   subtitle: "letters from teachers and people i've worked with",
