@@ -1,58 +1,423 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import './App.css';
-import IntroAnimation from './components/IntroAnimation';
-import InteractiveBackground from './components/InteractiveBackground';
-import Header from './components/Header';
-import Hero from './components/Hero';
-import About from './components/About';
-import Skills from './components/Skills';
-import Projects from './components/Projects';
-import Experience from './components/Experience';
-import Achievements from './components/Achievements';
-import Recommendations from './components/Recommendations';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Mail, Github, Linkedin, Instagram, ChevronDown, Loader2 } from 'lucide-react';
+import { personalInfo } from './data/portfolioData';
 
-function App() {
-  const [introComplete, setIntroComplete] = useState(false);
+const EASE = [0.22, 1, 0.36, 1];
+/* bump this whenever an image is swapped — it busts browser + CDN cache so
+   every visitor loads the new file instead of an old cached copy */
+const ASSET_V = '2';
+const asset = (path) => `${path}?v=${ASSET_V}`;
+const FORMSPREE_ID = (import.meta.env.VITE_FORMSPREE_ID || '').trim();
+/* sha-256 hash of the access code (set via env, so the plain code is
+   never in the build). compute with: echo -n "yourcode" | sha256sum */
+const RECS_HASH = (import.meta.env.VITE_RECOMMENDATIONS_HASH || '').trim().toLowerCase();
 
+/* resume + letters, unlocked by the access code. these live in a folder
+   named after the code, so their paths only exist once the right code is
+   typed. nothing downloadable is baked into the build */
+const privateFiles = [
+  { label: 'Resume', file: 'resume.pdf' },
+  { label: 'Recommendation letter 1', file: 'recommendation1.pdf' },
+  // re-add these once the letters are ready:
+  // { label: 'Recommendation letter 2', file: 'recommendation2.pdf' },
+  // { label: 'Recommendation letter 3', file: 'recommendation3.pdf' },
+];
+
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/* highlighted place name */
+const Hl = ({ children }) => <span className="hl">{children}</span>;
+
+/* page content. body is the dropdown text, children is a nested
+   dropdown, image shows in the dropdown, contact swaps in the form */
+const things = [
+  {
+    title: <>Application Developer @ <Hl>Precision e-Business Group</Hl></>,
+    body: [
+      'Co-op placement on the engineering team at Precision e-Business Group, a B2B SaaS company in Burlington.',
+      'I write production code that real customers depend on, building and shipping features in a professional codebase alongside full-time developers.',
+    ],
+    image: { src: asset('/assets/work/precision-1.jpg'), alt: 'Precision e-Business Group' },
+  },
+  {
+    title: <>Founder of <Hl>Valantir</Hl></>,
+    body: [
+      'Valantir matches high school students with local volunteer opportunities, turning every hour into real experience, references, and resume-worthy skills. I founded it.',
+      'Built full-stack with Next.js, React, and a Postgres database.',
+    ],
+    link: { label: 'valantir.app', href: 'https://valantir.app' },
+    image: { src: asset('/assets/projects/valantir-1.jpg'), alt: 'Valantir' },
+  },
+  {
+    title: <>Business Lead @ <Hl>FRC 1334 Robotics</Hl></>,
+    body: [
+      'I run sponsorships, outreach, pitch writing, and team strategy, making the team look professional and presenting our progress clearly.',
+    ],
+    image: { src: asset('/assets/experience/robotics-1.png'), alt: 'FRC 1334 Robotics' },
+  },
+  {
+    title: <>Programmer @ <Hl>EmpowerED</Hl></>,
+    body: [
+      'EmpowerED is a student-run initiative helping people experiencing homelessness get back on their feet, connecting them to legal support, resources, and a real path forward.',
+      'I build the software for this wonderful initiative.',
+    ],
+    image: { src: asset('/assets/projects/empowered-1.jpg'), alt: 'EmpowerED' },
+  },
+  {
+    title: <>I founded the <Hl>FinTech club at OTHS</Hl></>,
+    body: [
+      'I founded and run OTHS\'s fintech club, building a community of like-minded people who care about business, finance, and technology.',
+    ],
+    link: { label: 'variance.gg', href: 'https://variance.gg' },
+    image: { src: asset('/assets/experience/fintech-1.jpg'), alt: 'Fintech Club' },
+  },
+  {
+    title: <>Founder of the <Hl>Oakville Trafalgar Bike Club</Hl></>,
+    body: [
+      "Started the club to get more students riding and training with real structure. We've ridden to Niagara (115 km) and Toronto (40 km), and run collaborations with other clubs and schools.",
+      'On June 26th, 2026 we’re hosting a community ride with the Town of Oakville, giving away free gear.',
+    ],
+    link: { label: '@othsbikeclub', href: 'https://www.instagram.com/othsbikeclub', Icon: Instagram },
+    image: { src: asset('/assets/experience/bikeclub-1.png'), alt: 'OTHS Bike Club' },
+  },
+  {
+    title: <>Leadership with the <Hl>Halton Police PEACE</Hl> youth program</>,
+    body: [
+      'Took part in Halton Regional Police’s PEACE youth program, a leadership and community-engagement initiative that brings students together with officers.',
+      'Worked on outreach and community activities, building confidence, teamwork, and a real sense of responsibility.',
+      'I also volunteered at the Nipissing medical clinic.',
+    ],
+    image: { src: asset('/assets/experience/volunteer-1.png'), alt: 'Halton Police PEACE youth program' },
+  },
+  {
+    title: <>Built an <Hl>ESP32 Wi-Fi vending machine</Hl></>,
+    body: [
+      'A working vending machine on an ESP32 with a keypad, I2C LCD, and three servos, built for my computer engineering elective.',
+      'Users join a peer-to-peer network, register and log in, then dispense a product from the pinpad. Built in two weeks.',
+    ],
+    image: { src: asset('/assets/projects/christmas.jpg'), alt: 'ESP32 vending machine' },
+  },
+  {
+    title: <><Hl>Honor Roll</Hl> student at OTHS</>,
+    body: ['Top results while balancing everything outside of class.'],
+  },
+  {
+    title: <>Certified in <Hl>first aid</Hl>, <Hl>IT</Hl> & <Hl>track racing</Hl></>,
+    children: [
+      { title: 'Standard First Aid & CPR/AED', body: ['Current certification in first aid and CPR/AED response.'] },
+      { title: 'Cisco IT Essentials 8', body: ['Cisco’s certification in computer hardware and IT fundamentals.'] },
+      { title: 'Microsoft Office Specialist (MOS)', body: ['Certified Microsoft Office Specialist.'] },
+      { title: 'Track Racing Certification', body: ['Completed at the Mattamy National Cycling Centre.'] },
+    ],
+  },
+  {
+    title: <>Volunteered in <Hl>healthcare</Hl>, <Hl>community</Hl>, <Hl>STEM</Hl> & <Hl>tutoring</Hl></>,
+    body: [
+      'Healthcare clinic support, food bank and community work, STEM mentoring, and tutoring younger students.',
+      'Learned to be dependable, communicate clearly, and help without needing supervision.',
+    ],
+  },
+  {
+    title: <>Speaks <Hl>6 languages</Hl></>,
+    body: [
+      'English, French, Arabic, Urdu, Hindi, and Punjabi. Switching between them makes it easy to connect with all kinds of people.',
+    ],
+  },
+  {
+    title: <>See my <Hl>resume &amp; recommendation letters</Hl></>,
+    recommendations: true,
+  },
+  {
+    title: 'Get in touch',
+    contact: true,
+  },
+];
+
+const socials = [
+  { label: 'Email', href: `mailto:${personalInfo.email}`, Icon: Mail },
+  { label: 'GitHub', href: personalInfo.social.github, Icon: Github },
+  { label: 'LinkedIn', href: personalInfo.social.linkedin, Icon: Linkedin },
+  { label: 'Instagram', href: personalInfo.social.instagram, Icon: Instagram },
+];
+
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.12 } },
+};
+const itemV = {
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+};
+
+/* image with graceful placeholder if not uploaded yet */
+function Figure({ src, alt }) {
+  const [ok, setOk] = useState(true);
   return (
-    <>
-      {!introComplete && (
-        <IntroAnimation onComplete={() => setIntroComplete(true)} />
+    <div className="figure">
+      {ok ? (
+        <img src={src} alt={alt} loading="lazy" onError={() => setOk(false)} />
+      ) : (
+        <div className="ph" role="img" aria-label={alt}>{alt}</div>
       )}
-
-      <InteractiveBackground heroOnly={true} />
-
-      <div className={`app ${introComplete ? 'app-visible' : 'app-hidden'}`}>
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-
-        <Header />
-
-        <main id="main-content" className="main-content">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Hero />
-            <About />
-            <Skills />
-            <Projects />
-            <Experience />
-            <Achievements />
-            <Recommendations />
-            <Contact />
-          </motion.div>
-        </main>
-
-        <Footer />
-      </div>
-    </>
+    </div>
   );
 }
 
-export default App
+function Body({ body, image, link }) {
+  return (
+    <div className="body">
+      {body?.map((p, i) => <p key={i}>{p}</p>)}
+      {image && <Figure src={image.src} alt={image.alt} />}
+      {link && (
+        <a className="link" href={link.href} target="_blank" rel="noopener noreferrer">
+          {link.Icon && <link.Icon size={16} strokeWidth={1.75} />}
+          {link.label} {!link.Icon && '↗'}
+        </a>
+      )}
+    </div>
+  );
+}
+
+function ContactForm() {
+  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState(null); // null | 'sending' | 'ok' | 'err'
+
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('sending');
+    try {
+      if (FORMSPREE_ID) {
+        const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(form),
+        });
+        if (!res.ok) throw new Error('send failed');
+      } else {
+        const body = encodeURIComponent(`From: ${form.name} <${form.email}>\n\n${form.message}`);
+        window.location.href = `mailto:${personalInfo.email}?subject=${encodeURIComponent('Hello from your site')}&body=${body}`;
+      }
+      setStatus('ok');
+      setForm({ name: '', email: '', message: '' });
+    } catch {
+      setStatus('err');
+    }
+  };
+
+  return (
+    <form className="form" onSubmit={onSubmit}>
+      <input name="name" value={form.name} onChange={onChange} placeholder="Your name" required />
+      <input type="email" name="email" value={form.email} onChange={onChange} placeholder="Your email" required />
+      <textarea name="message" value={form.message} onChange={onChange} placeholder="Say hi..." required />
+      <button type="submit" disabled={status === 'sending'}>
+        {status === 'sending' ? <Loader2 size={16} className="spin" /> : 'Send'}
+      </button>
+      {status === 'ok' && <div className="status">Sent! I’ll get back to you soon.</div>}
+      {status === 'err' && <div className="status">Something went wrong. Use the direct link below.</div>}
+      <div className="status">
+        or email me directly:{' '}
+        <a className="mail-link" href={`mailto:${personalInfo.email}`}>{personalInfo.email}</a>
+      </div>
+    </form>
+  );
+}
+
+function Recommendations() {
+  const [code, setCode] = useState('');
+  const [token, setToken] = useState(''); // the verified code, used to build paths
+  const [error, setError] = useState(false);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    const entered = code.trim();
+    if (RECS_HASH && (await sha256(entered)) === RECS_HASH) {
+      setToken(entered);
+      setError(false);
+    } else {
+      setError(true);
+    }
+  };
+
+  if (token) {
+    return (
+      <div className="body">
+        <p>Thanks for the interest. Here’s my resume and letters.</p>
+        <div className="letters">
+          {privateFiles.map((f, i) => (
+            <a
+              key={i}
+              className="link"
+              href={`/assets/private/${encodeURIComponent(token)}/${f.file}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {f.label} ↗
+            </a>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="body">
+      <p>My resume and a few letters from teachers and people I’ve worked with. They’re private, so enter the access code I shared to open them.</p>
+      <form className="form" onSubmit={onSubmit}>
+        <input
+          name="code"
+          value={code}
+          onChange={(e) => { setCode(e.target.value); setError(false); }}
+          placeholder="Access code"
+          required
+        />
+        <button type="submit">Unlock</button>
+        {error && (
+          <div className="status">
+            That code isn’t right.{' '}
+            <a className="mail-link" href={`mailto:${personalInfo.email}`}>Email me</a> for access.
+          </div>
+        )}
+      </form>
+    </div>
+  );
+}
+
+function Disclosure({ title, small, isOpen, onToggle, children }) {
+  return (
+    <div className={`item${isOpen ? ' open' : ''}`}>
+      <div className={`pill${small ? ' pill-sm' : ''}`}>
+        <span className="pill-title">{title}</span>
+        <button
+          className="chev-btn"
+          aria-expanded={isOpen}
+          aria-label={isOpen ? 'Collapse' : 'Expand'}
+          onClick={onToggle}
+        >
+          <ChevronDown className="chev" size={small ? 15 : 17} strokeWidth={2.75} aria-hidden="true" />
+        </button>
+      </div>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.5, ease: EASE }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className="detail-inner">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* nested single-open accordion for certifications */
+function CertList({ items }) {
+  const [open, setOpen] = useState(null);
+  return (
+    <div className="cert-list">
+      {items.map((c, j) => (
+        <Disclosure
+          key={j}
+          small
+          title={c.title}
+          isOpen={open === j}
+          onToggle={() => setOpen(open === j ? null : j)}
+        >
+          <Body body={c.body} />
+        </Disclosure>
+      ))}
+    </div>
+  );
+}
+
+function App() {
+  const [open, setOpen] = useState(null); // single-open at the top level
+  const [copied, setCopied] = useState(false);
+
+  const onEmail = (e) => {
+    if (navigator.clipboard) {
+      e.preventDefault();
+      navigator.clipboard.writeText(personalInfo.email).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1800);
+        window.location.href = `mailto:${personalInfo.email}`;
+      });
+    }
+  };
+
+  return (
+    <div className="page">
+      <motion.header
+        className="hero"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: EASE }}
+      >
+        <img className="avatar" src={asset('/assets/profile.jpg')} alt="Hani Zaidi" />
+        <h1 className="name">Hani Zaidi</h1>
+      </motion.header>
+
+      <motion.div className="list" variants={container} initial="hidden" animate="show">
+        {things.map((t, i) => (
+          <motion.div className="item-wrap" variants={itemV} key={i}>
+            <Disclosure
+              title={t.title}
+              isOpen={open === i}
+              onToggle={() => setOpen(open === i ? null : i)}
+            >
+              {t.contact ? (
+                <ContactForm />
+              ) : t.recommendations ? (
+                <Recommendations />
+              ) : t.children ? (
+                <CertList items={t.children} />
+              ) : (
+                <Body body={t.body} image={t.image} link={t.link} />
+              )}
+            </Disclosure>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      <motion.div
+        className="footer"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.9, duration: 0.8, ease: EASE }}
+      >
+        <div className="icons">
+          {socials.map(({ label, href, Icon }) => {
+            const isMail = href.startsWith('mailto:');
+            return (
+              <a
+                key={label}
+                className="icon"
+                href={href}
+                aria-label={label}
+                onClick={isMail ? onEmail : undefined}
+                {...(isMail ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
+              >
+                <Icon size={20} strokeWidth={1.75} />
+              </a>
+            );
+          })}
+        </div>
+        <div className="note">
+          {copied ? 'email copied to clipboard ✓' : <>made with love - hxn1.dev © {new Date().getFullYear()}</>}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+export default App;

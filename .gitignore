@@ -33,3 +33,10 @@ dist-ssr
 *.pem
 *.key
 secrets.json
+data/portfolioData.js
+
+# Private assets (resume, recommendations, etc.)
+public/assets/private/
+
+# Local Claude config / memory
+.claude/
