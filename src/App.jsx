@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Github, Linkedin, Instagram, ChevronDown, Loader2 } from 'lucide-react';
 import { personalInfo } from './data/portfolioData';
@@ -9,25 +9,56 @@ const EASE = [0.22, 1, 0.36, 1];
 const ASSET_V = '2';
 const asset = (path) => `${path}?v=${ASSET_V}`;
 const FORMSPREE_ID = (import.meta.env.VITE_FORMSPREE_ID || '').trim();
-/* sha-256 hash of the access code (set via env, so the plain code is
-   never in the build). compute with: echo -n "yourcode" | sha256sum */
-const RECS_HASH = (import.meta.env.VITE_RECOMMENDATIONS_HASH || '').trim().toLowerCase();
 
-/* resume + letters, unlocked by the access code. these live in a folder
-   named after the code, so their paths only exist once the right code is
-   typed. nothing downloadable is baked into the build */
-const privateFiles = [
-  { label: 'Resume', file: 'resume.pdf' },
-  { label: 'Recommendation letter 1', file: 'recommendation1.pdf' },
-  // re-add these once the letters are ready:
-  // { label: 'Recommendation letter 2', file: 'recommendation2.pdf' },
-  // { label: 'Recommendation letter 3', file: 'recommendation3.pdf' },
-];
+/* Resume + letters are served as AES-256-GCM ciphertext (see
+   scripts/encrypt-private.mjs). The access code is the decryption password —
+   it never leaves the browser, and the plaintext PDFs never exist on the
+   server. A wrong code fails the GCM auth tag, so decryption just throws.
+   The encrypted blobs are public but useless without the code. */
+const PRIVATE_DIR = '/assets/private';
 
-async function sha256(text) {
-  const data = new TextEncoder().encode(text);
-  const buf = await crypto.subtle.digest('SHA-256', data);
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+const b64ToBytes = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+
+async function deriveKey(password, salt, iterations) {
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    'PBKDF2',
+    false,
+    ['deriveKey'],
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['decrypt'],
+  );
+}
+
+/* Fetch the manifest, derive the key from the code, then download + decrypt
+   every file. Throws if the code is wrong (GCM tag mismatch) or files are
+   missing. Returns [{ label, filename, url }] with in-memory blob URLs. */
+async function unlockPrivateFiles(code) {
+  const res = await fetch(`${PRIVATE_DIR}/manifest.json`, { cache: 'no-store' });
+  if (!res.ok) throw new Error('manifest unavailable');
+  const manifest = await res.json();
+  const key = await deriveKey(code, b64ToBytes(manifest.salt), manifest.iterations);
+
+  return Promise.all(
+    manifest.files.map(async (f) => {
+      const enc = await fetch(`${PRIVATE_DIR}/${f.name}`, { cache: 'no-store' });
+      if (!enc.ok) throw new Error(`missing ${f.name}`);
+      const cipher = await enc.arrayBuffer();
+      const plain = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: b64ToBytes(f.iv) },
+        key,
+        cipher,
+      );
+      const url = URL.createObjectURL(new Blob([plain], { type: f.type || 'application/pdf' }));
+      return { label: f.label, filename: f.filename, url };
+    }),
+  );
 }
 
 /* highlighted place name */
@@ -48,6 +79,7 @@ const things = [
     title: <>Founder of <Hl>Valantir</Hl></>,
     body: [
       'Valantir matches high school students with local volunteer opportunities, turning every hour into real experience, references, and resume-worthy skills. I founded it.',
+      'We already have 15 local businesses on board offering opportunities to students.',
       'Built full-stack with Next.js, React, and a Postgres database.',
     ],
     link: { label: 'valantir.app', href: 'https://valantir.app' },
@@ -57,6 +89,7 @@ const things = [
     title: <>Business Lead @ <Hl>FRC 1334 Robotics</Hl></>,
     body: [
       'I run sponsorships, outreach, pitch writing, and team strategy, making the team look professional and presenting our progress clearly.',
+      'I led our team to raising $80,000 in funding.',
     ],
     image: { src: asset('/assets/experience/robotics-1.png'), alt: 'FRC 1334 Robotics' },
   },
@@ -90,7 +123,6 @@ const things = [
     body: [
       'Took part in Halton Regional Police’s PEACE youth program, a leadership and community-engagement initiative that brings students together with officers.',
       'Worked on outreach and community activities, building confidence, teamwork, and a real sense of responsibility.',
-      'I also volunteered at the Nipissing medical clinic.',
     ],
     image: { src: asset('/assets/experience/volunteer-1.png'), alt: 'Halton Police PEACE youth program' },
   },
@@ -104,7 +136,7 @@ const things = [
   },
   {
     title: <><Hl>Honor Roll</Hl> student at OTHS</>,
-    body: ['Top results while balancing everything outside of class.'],
+    body: ['98% Grade 11 semester 2 GPA, strong resulst while balancing everything outside of class.'],
   },
   {
     title: <>Certified in <Hl>first aid</Hl>, <Hl>IT</Hl> & <Hl>track racing</Hl></>,
@@ -118,7 +150,7 @@ const things = [
   {
     title: <>Volunteered in <Hl>healthcare</Hl>, <Hl>community</Hl>, <Hl>STEM</Hl> & <Hl>tutoring</Hl></>,
     body: [
-      'Healthcare clinic support, food bank and community work, STEM mentoring, and tutoring younger students.',
+      'Volunteered at the Nipissing Medical Clinic supporting patients and staff, at Oakville STEM Tutoring helping younger students with math and science, and at the Birch Glen Food Bank packing and handing out food to families.',
       'Learned to be dependable, communicate clearly, and help without needing supervision.',
     ],
   },
@@ -231,32 +263,40 @@ function ContactForm() {
 
 function Recommendations() {
   const [code, setCode] = useState('');
-  const [token, setToken] = useState(''); // the verified code, used to build paths
-  const [error, setError] = useState(false);
+  const [status, setStatus] = useState('idle'); // idle | working | error | done
+  const [files, setFiles] = useState([]);
+
+  // revoke the in-memory blob URLs when they're replaced or the view unmounts
+  useEffect(() => () => files.forEach((f) => URL.revokeObjectURL(f.url)), [files]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     const entered = code.trim();
-    if (RECS_HASH && (await sha256(entered)) === RECS_HASH) {
-      setToken(entered);
-      setError(false);
-    } else {
-      setError(true);
+    if (!entered) return;
+    setStatus('working');
+    try {
+      const unlocked = await unlockPrivateFiles(entered);
+      setFiles(unlocked);
+      setStatus('done');
+    } catch {
+      // wrong code (GCM tag fails) or files unavailable — same message either way
+      setStatus('error');
     }
   };
 
-  if (token) {
+  if (status === 'done') {
     return (
       <div className="body">
         <p>Thanks for the interest. Here’s my resume and letters.</p>
         <div className="letters">
-          {privateFiles.map((f, i) => (
+          {files.map((f, i) => (
             <a
               key={i}
               className="link"
-              href={`/assets/private/${encodeURIComponent(token)}/${f.file}`}
+              href={f.url}
               target="_blank"
               rel="noopener noreferrer"
+              download={f.filename}
             >
               {f.label} ↗
             </a>
@@ -273,12 +313,14 @@ function Recommendations() {
         <input
           name="code"
           value={code}
-          onChange={(e) => { setCode(e.target.value); setError(false); }}
+          onChange={(e) => { setCode(e.target.value); if (status === 'error') setStatus('idle'); }}
           placeholder="Access code"
           required
         />
-        <button type="submit">Unlock</button>
-        {error && (
+        <button type="submit" disabled={status === 'working'}>
+          {status === 'working' ? <Loader2 size={16} className="spin" /> : 'Unlock'}
+        </button>
+        {status === 'error' && (
           <div className="status">
             That code isn’t right.{' '}
             <a className="mail-link" href={`mailto:${personalInfo.email}`}>Email me</a> for access.

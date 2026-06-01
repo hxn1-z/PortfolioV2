@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "encrypt": "node scripts/encrypt-private.mjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
