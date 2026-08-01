@@ -89,7 +89,7 @@ const things = [
     title: <>Business Lead @ <Hl>FRC 1334 Robotics</Hl></>,
     body: [
       'I run sponsorships, outreach, pitch writing, and team strategy, making the team look professional and presenting our progress clearly.',
-      'I led our team to raising $80,000 in funding.',
+      'I led our team to raising over $70,000 in funding.',
     ],
     image: { src: asset('/assets/experience/robotics-1.png'), alt: 'FRC 1334 Robotics' },
   },
