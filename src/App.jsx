@@ -68,7 +68,7 @@ const Hl = ({ children }) => <span className="hl">{children}</span>;
    dropdown, image shows in the dropdown, contact swaps in the form */
 const things = [
   {
-    title: <>Application Developer @ <Hl>Precision e-Business Group</Hl></>,
+    title: <>Software Engineer @ <Hl>Precision e-Business Group</Hl></>,
     body: [
       'Co-op placement on the engineering team at Precision e-Business Group, a B2B SaaS company in Burlington.',
       'I write production code that real customers depend on, building and shipping features in a professional codebase alongside full-time developers.',
@@ -79,7 +79,7 @@ const things = [
     title: <>Founder of <Hl>Valantir</Hl></>,
     body: [
       'Valantir matches high school students with local volunteer opportunities, turning every hour into real experience, references, and resume-worthy skills. I founded it.',
-      'We already have 15 local businesses on board offering opportunities to students.',
+      'We already have over 500 local organizations registered, connecting students with volunteer opportunities in their communities.',
       'Built full-stack with Next.js, React, and a Postgres database.',
     ],
     link: { label: 'valantir.app', href: 'https://valantir.app' },
