@@ -6,7 +6,7 @@ import { personalInfo } from './data/portfolioData';
 const EASE = [0.22, 1, 0.36, 1];
 /* bump this whenever an image is swapped — it busts browser + CDN cache so
    every visitor loads the new file instead of an old cached copy */
-const ASSET_V = '2';
+const ASSET_V = '3';
 const asset = (path) => `${path}?v=${ASSET_V}`;
 const FORMSPREE_ID = (import.meta.env.VITE_FORMSPREE_ID || '').trim();
 
@@ -83,7 +83,7 @@ const things = [
       'Built full-stack with Next.js, React, and a Postgres database.',
     ],
     link: { label: 'valantir.app', href: 'https://valantir.app' },
-    image: { src: asset('/assets/projects/valantir-1.jpg'), alt: 'Valantir' },
+    image: { src: asset('/assets/projects/valantir-1.png'), alt: 'Valantir' },
   },
   {
     title: <>Business Lead @ <Hl>FRC 1334 Robotics</Hl></>,
