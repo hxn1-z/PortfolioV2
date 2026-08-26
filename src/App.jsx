@@ -80,6 +80,7 @@ const things = [
     body: [
       'Valantir matches high school students with local volunteer opportunities, turning every hour into real experience, references, and resume-worthy skills. I founded it.',
       'We already have over 500 local organizations registered, connecting students with volunteer opportunities in their communities.',
+      'Valantir has received over 30 organization reviews and collaborated with the PMC on student outreach.',
       'Built full-stack with Next.js, React, and a Postgres database.',
     ],
     link: { label: 'valantir.app', href: 'https://valantir.app' },
