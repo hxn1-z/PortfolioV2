@@ -3,7 +3,7 @@ export const personalInfo = {
   email: "m.hanizaidi@gmail.com",
   social: {
     github: "https://github.com/hni-z",
-    linkedin: "https://www.linkedin.com/in/hani-zaidi-50aa99386/",
+    linkedin: "https://www.linkedin.com/in/hani-zaidi/",
     instagram: "https://www.instagram.com/hanizaidi09/",
   },
 };
