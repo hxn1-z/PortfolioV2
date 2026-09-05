@@ -1,8 +1,8 @@
-# hxn1.dev
+# hani.so
 
 My personal portfolio. A single-page site listing what I'm working on across business and software, with expandable sections and a contact form.
 
-Live at [hxn1.dev](https://hxn1.dev).
+Live at [hani.so](https://hani.so).
 
 ## Stack
 

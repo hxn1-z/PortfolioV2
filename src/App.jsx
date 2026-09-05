@@ -456,7 +456,7 @@ function App() {
           })}
         </div>
         <div className="note">
-          {copied ? 'email copied to clipboard ✓' : <>made with love - hxn1.dev © {new Date().getFullYear()}</>}
+          {copied ? 'email copied to clipboard ✓' : <>made with love - hani.so © {new Date().getFullYear()}</>}
         </div>
       </motion.div>
     </div>
